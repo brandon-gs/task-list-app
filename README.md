@@ -22,7 +22,8 @@
 - [x] Add feature to update one todo
 - [ ] Show alerts when todo is created or deleted (this maybe no because we must show the undo toast)
 - [ ] Add trash section to see deleted items, remove it after 30 days
-- [ ] play sound when checked a task
+- [x] play sound when checked a task
+- [ ] Add testing with jest
 
 # POSIBLE FEATURES
 
