@@ -97,7 +97,7 @@ const TodoItem: FC<TodoItemProps> = props => {
         py={2}
         bg={useColorModeValue('warmGray.50', 'primary.900')}>
         <Box w={30} h={30} mr={2}>
-          <Pressable onPress={onToggleCheckbox}>
+          <Pressable onPress={onToggleCheckbox} android_disableSound>
             <AnimatedCheckbox
               highlightColor={highlightColor}
               checkmarkColor={checkmarkColor}

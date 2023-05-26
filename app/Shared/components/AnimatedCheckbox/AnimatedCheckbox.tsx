@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, {Path, Defs, ClipPath, G} from 'react-native-svg';
 import AnimatedStroke from '../AnimatedStroke/AnimatedStroke';
+import {checkedSound} from '@app/Todo/utils';
 
 const MARGIN = 10;
 const vWidth = 64 + MARGIN;
@@ -23,6 +24,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 interface CheckboxProps {
   checked: boolean;
+  playSound?: boolean;
   highlightColor?: string;
   checkmarkColor?: string;
   boxOutlineColor?: string;
@@ -30,6 +32,7 @@ interface CheckboxProps {
 
 const AnimatedCheckbox: FC<CheckboxProps> = ({
   checked,
+  playSound = true,
   checkmarkColor = '#000000',
   highlightColor = '#ff0000',
   boxOutlineColor = '#000000',
@@ -76,6 +79,11 @@ const AnimatedCheckbox: FC<CheckboxProps> = ({
       duration: checked ? 300 : 100,
       easing: Easing.linear,
     });
+    if (playSound && checked) {
+      checkedSound.stop(() => {
+        checkedSound.play();
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked]);
 
