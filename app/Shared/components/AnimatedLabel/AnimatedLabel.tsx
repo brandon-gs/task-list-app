@@ -77,7 +77,10 @@ const AnimatedLabel = memo((props: Props) => {
 
   return (
     <Pressable onPress={onPress}>
-      <AnimatedHStack alignItems="center" style={[hstackAnimatedStyles]}>
+      <AnimatedHStack
+        alignItems="center"
+        w="full"
+        style={[hstackAnimatedStyles]}>
         <AnimatedText
           fontSize={19}
           noOfLines={1}

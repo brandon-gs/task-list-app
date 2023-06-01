@@ -8,6 +8,7 @@ import {useTodosData} from '../hooks';
 const ScreenMain = () => {
   const {
     data,
+    isDataLoaded,
     editingItemId,
     undoData,
     handleToggleTaskItem,
@@ -42,6 +43,7 @@ const ScreenMain = () => {
         </Masthead>
         <TodoList
           data={data}
+          isLoading={!isDataLoaded}
           onToggleItem={handleToggleTaskItem}
           onChangeSubject={handleChangeTaskItemSubject}
           onFinishEditing={handleFinishEditingTaskItem}

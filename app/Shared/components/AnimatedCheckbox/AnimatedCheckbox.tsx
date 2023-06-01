@@ -1,4 +1,4 @@
-import {FC, useEffect} from 'react';
+import {FC, useEffect, useState} from 'react';
 import Animated, {
   Easing,
   createAnimatedPropAdapter,
@@ -37,6 +37,7 @@ const AnimatedCheckbox: FC<CheckboxProps> = ({
   highlightColor = '#ff0000',
   boxOutlineColor = '#000000',
 }) => {
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const progress = useSharedValue<number>(0);
 
   const animatedBoxProps = useAnimatedProps(
@@ -79,13 +80,20 @@ const AnimatedCheckbox: FC<CheckboxProps> = ({
       duration: checked ? 300 : 100,
       easing: Easing.linear,
     });
-    if (playSound && checked) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checked]);
+
+  useEffect(() => {
+    if (playSound && isMounted && checked) {
       checkedSound.stop(() => {
         checkedSound.play();
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked]);
+  }, [checked, playSound, isMounted]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Svg

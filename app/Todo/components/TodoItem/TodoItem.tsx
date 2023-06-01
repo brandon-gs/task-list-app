@@ -93,7 +93,8 @@ const TodoItem: FC<TodoItemProps> = props => {
         alignItems="center"
         w="full"
         h={'46.5px'}
-        px={4}
+        pl={4}
+        pr={'16px'}
         py={2}
         bg={useColorModeValue('warmGray.50', 'primary.900')}>
         <Box w={30} h={30} mr={2}>
@@ -112,7 +113,8 @@ const TodoItem: FC<TodoItemProps> = props => {
             value={subject}
             variant="unstyled"
             fontSize={19}
-            px={1}
+            px={'16px'}
+            mr={'8px'}
             py={0}
             autoFocus
             blurOnSubmit
