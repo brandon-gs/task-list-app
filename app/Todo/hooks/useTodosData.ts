@@ -1,91 +1,36 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {TaskItemData} from '../components';
 import shortid from 'shortid';
-
-const initialData: TaskItemData[] = [
-  {
-    id: shortid.generate(),
-    subject: 'Buy movie tickets for Friday 1',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 2',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 3',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 4',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 5',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 6',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 7',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 8',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 9',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 10 ',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 11',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 12',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 13',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 14',
-    done: false,
-  },
-  {
-    id: shortid.generate(),
-    subject: 'Make a React Native tutorial 15',
-    done: false,
-  },
-];
+import {getTasks, syncTasks} from '../services/task';
 
 const useTodosData = () => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<TaskItemData[]>([]);
+  const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
   const [undoData, setUndoData] = useState<
     (TaskItemData & {position: number}) | null
   >(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  // CRUD opeartions
+  const handleCreateItem = useCallback(() => {
+    const id = shortid.generate();
+    setData(prev => [
+      {
+        id,
+        subject: '',
+        done: false,
+      },
+      ...prev,
+    ]);
+    setEditingItemId(id);
+  }, []);
+
+  const handleRemoveItem = useCallback((item: TaskItemData) => {
+    setData(prevData => {
+      const newData = prevData.filter(i => i !== item);
+      return newData;
+    });
+  }, []);
 
   const handleToggleTaskItem = useCallback((item: TaskItemData) => {
     setData(prevData => {
@@ -114,21 +59,6 @@ const useTodosData = () => {
     [],
   );
 
-  const handleFinishEditingTaskItem = useCallback((_item: TaskItemData) => {
-    setEditingItemId(null);
-  }, []);
-
-  const handlePressTaskItemLabel = useCallback((item: TaskItemData) => {
-    setEditingItemId(item.id);
-  }, []);
-
-  const handleRemoveItem = useCallback((item: TaskItemData) => {
-    setData(prevData => {
-      const newData = prevData.filter(i => i !== item);
-      return newData;
-    });
-  }, []);
-
   const handleUndoRemoveItem = useCallback(() => {
     setUndoData(prevUndoData => {
       if (prevUndoData === null) {
@@ -151,21 +81,18 @@ const useTodosData = () => {
     });
   }, []);
 
-  const handleToastDisappear = useCallback(() => {
-    setUndoData(null);
+  // Helpers functions
+
+  const handleFinishEditingTaskItem = useCallback((_item: TaskItemData) => {
+    setEditingItemId(null);
   }, []);
 
-  const handleCreateItem = useCallback(() => {
-    const id = shortid.generate();
-    setData(prev => [
-      {
-        id,
-        subject: '',
-        done: false,
-      },
-      ...prev,
-    ]);
-    setEditingItemId(id);
+  const handlePressTaskItemLabel = useCallback((item: TaskItemData) => {
+    setEditingItemId(item.id);
+  }, []);
+
+  const handleToastDisappear = useCallback(() => {
+    setUndoData(null);
   }, []);
 
   const handleSetUndoData = useCallback(
@@ -175,10 +102,34 @@ const useTodosData = () => {
     [],
   );
 
+  /**
+   * Allow us to get our initial data state with our tasks saved on Async Storage
+   */
+  useEffect(() => {
+    (async () => {
+      const initialTasks = await getTasks();
+      setData(initialTasks);
+      setIsDataLoaded(true);
+    })();
+  }, []);
+
+  /**
+   * Allow us to sync our Async Storage with every change on data state
+   */
+  useEffect(() => {
+    if (!isDataLoaded) {
+      return;
+    }
+    (async () => {
+      syncTasks(data);
+    })();
+  }, [data, isDataLoaded]);
+
   return {
     data,
     editingItemId,
     undoData,
+    isDataLoaded,
     handleToggleTaskItem,
     handleChangeTaskItemSubject,
     handleFinishEditingTaskItem,
